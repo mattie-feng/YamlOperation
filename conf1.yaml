@@ -1,0 +1,11 @@
+Host_Group:
+  HG1:
+  - IQN1
+  - IQN2
+  - IQN3
+  - IQN4
+  - IQN5
+  - IQN6
+  HG2:
+  - IQN7
+  - IQN8
