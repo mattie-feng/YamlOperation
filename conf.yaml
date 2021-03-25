@@ -1,109 +1,96 @@
-Host_Group: conf1.yaml
-
-Service_Group:
-  SG1:
-    node: [N1,N2,N5,N6]
-    hostgroup: [HG1]
-    portal: [vp_Portal_SG1_111]
-    target: [target1]
-    drbd: [res_g_1]
-    iLU: [iLU2]
-  SG2:
-    node: [N3,N4]
-    hostgroup: []
-    portal: []
-    target: []
-    drbd: []
-    iLU: []
-  SG3:
-    node: [N7,N8]
-    hostgroup: []
-    portal: []
-    target: []
-    drbd: []
-    iLU: []
-
 Cluster:
-  Node: #[N1,N2,N3,N4,N5,N6,N7,N8]
+  Node:
     N1:
+      Service_Group:
+      - SG1
+      Storagepool:
+      - HDD_storagepool1
       ip: 10.203.1.89
       type: Combined
-      # status: ONLINE
-      # 是否需要增加所属服务节点？
-      # 可以添加，创建Service_Group的时候就可以提醒用户该Node已在其他服务组
-      Service_Group: [SG1]
-      # 从命名体现类型：HDD，SSD
-      Storagepool: [HDD_storagepool1]
     N2:
+      Service_Group:
+      - SG1
+      Storagepool:
+      - HDD_storagepool1
       ip: 10.203.1.88
       type: Combined
-      # status: ONLINE
-      Service_Group: [SG1]
-      Storagepool: [HDD_storagepool1]
     N3:
+      Service_Group:
+      - SG2
+      Storagepool:
+      - HDD_storagepool1
       ip: 10.203.1.90
       type: Combined
-      # status: ONLINE
-      Service_Group: [SG2]
-      Storagepool: [HDD_storagepool1]
     N4:
+      Service_Group:
+      - SG2
+      Storagepool:
+      - SSD_storagepool1
       ip: 10.203.1.91
       type: Combined
-      # status: ONLINE
-      Service_Group: [SG2]
-      Storagepool: [SSD_storagepool1]
     N5:
+      Service_Group:
+      - SG1
+      Storagepool:
+      - SSD_storagepool1
       ip: 10.203.1.92
       type: Combined
-      # status: ONLINE
-      Service_Group: [SG1]
-      Storagepool: [SSD_storagepool1]
     N6:
+      Service_Group:
+      - SG1
+      Storagepool: []
       ip: 10.203.1.93
       type: Combined
-      # status: ONLINE
-      Service_Group: [SG1]
-      Storagepool: []
     N7:
-      ip: 10.203.1.94
-      type: Combined
-      # status: ONLINE
       Service_Group: []
       Storagepool: []
-
+      ip: 10.203.1.94
+      type: Combined
   VIP_Pool:
     vip_pool_1:
-      # tag为示例，待议
+      available:
+      - 10.0.0.113
+      - 10.0.0.114
+      network_segment: 10.0.0.0
       tag: 10G
-      # 未被使用的VIP,available
-      available: [10.0.0.113,10.0.0.114]
-      # 已被使用VIP，used
-      used: [10.0.0.111,10.0.0.112]
+      used:
+      - 10.0.0.111
+      - 10.0.0.112
     vip_pool_2:
-      # tag为示例，待议
+      available:
+      - 192.168.7.10
+      - 192.168.7.14
+      network_segment: 192.168.7.0
       tag: 10G
-      available: [192.168.7.10,192.168.7.14]
       used: []
-
 DRBD:
-  # 资源组
   res_g_1:
     vp_res_HostGroup1_1:
-      mirror_way: 2
-      size: 10M
       diskfull_node: N1,N2
       diskless_node: N5,N6
+      mirror_way: 2
+      size: 10M
     vp_res_HostGroup1_2:
-      mirror_way: 2
-      size: 10M
       diskfull_node: N1,N2
       diskless_node: N5,N6
+      mirror_way: 2
+      size: 10M
     vp_res_HostGroup1_3:
-      mirror_way: 2
-      size: 10M
       diskfull_node: N1,N2
       diskless_node: N5,N6
-
+      mirror_way: 2
+      size: 10M
+Host_Group:
+  HG1:
+  - IQN1
+  - IQN2
+  - IQN3
+  - IQN4
+  - IQN5
+  - IQN6
+  HG2:
+  - IQN7
+  - IQN8
 Portal:
   vp_Portal_SG1_111:
     VIP_Pool: vip_pool_1
@@ -115,34 +102,57 @@ Portal:
     ip: 10.0.0.112
     netmask: 24
     port: 3260
-
+Service_Group:
+  SG1:
+    drbd:
+    - res_g_1
+    hostgroup:
+    - HG1
+    iLU:
+    - iLU2
+    node:
+    - N1
+    - N2
+    - N5
+    - N6
+    portal:
+    - vp_Portal_SG1_111
+    target:
+    - target1
+  SG2:
+    drbd: []
+    hostgroup: []
+    iLU: []
+    node:
+    - N1
+    - N5
+    - N5
+    - N6
+    portal: []
+    target: []
+  SG3:
+    drbd: []
+    hostgroup: []
+    iLU: []
+    node:
+    - N7
+    - N8
+    portal: []
+    target: []
 Target:
   target1:
     IQN: iqn.xxxxxx:SG1_111_1
     Portal: vp_Portal_SG1_111
-
 iLU:
   iLU1:
-    dev: /dev/drbd1001
-    Target: target1
     LUN_ID: 0
+    Target: target1
+    dev: /dev/drbd1001
   iLU2:
-    dev: /dev/drbd1001
-    Target: target1
     LUN_ID: 0
-  iLU3:
-    dev: /dev/drbd1001
     Target: target1
+    dev: /dev/drbd1001
+  iLU3:
     LUN_ID: 2
-
-#Map:
-#  SG1_HG1:
-#    Service_Group: SG1
-#    Host_Group: HG1
-#    Res_list: [vp_res_HostGroup1_1,vp_res_HostGroup1_2,vp_res_HostGroup1_3]
-#    iLU: iLU1
-#  SG1_HG2:
-#    Service_Group: SG1
-#    Host_Group: HG1
-#    Res_list: [vp_res_HostGroup1_1,vp_res_HostGroup1_2,vp_res_HostGroup1_3]
-#    iLU: iLU2
+    Target: target1
+    dev: /dev/drbd1001

@@ -46,9 +46,9 @@ class ClusterConfig(YamlOperation):
                     value = value[key]
                 else:
                     print("Error key!")
-                    return False
+                    return
             return value
-        except AttributeError:
+        except (AttributeError, TypeError):
             print("Error key!!")
 
     def get_length(self, *value):
@@ -69,6 +69,7 @@ class ClusterConfig(YamlOperation):
         self.update_yaml(self.yaml_dict)
 
     def delete_value_in_list(self, *key_tuple, value):
+        """根据传进来的Key，删除对应的value（list）中的某个值"""
         config_value = self.get_value_by_key(*key_tuple)
         if config_value:
             if type(config_value) is list:
@@ -85,6 +86,7 @@ class ClusterConfig(YamlOperation):
         self.update_yaml(self.yaml_dict)
 
     def add_value_by_key(self, *key_tuple, value):
+        """根据传进来的Key，添加某个值到对应的value（list）中"""
         config_value = self.get_value_by_key(*key_tuple)
         if config_value:
             if type(config_value) is list:
@@ -100,30 +102,45 @@ class ClusterConfig(YamlOperation):
                 self.modify_value_by_key(*key_tuple, value=[value])
 
     def get_member_list(self, key):
-        """获取集群中对应资源的所有成员，返回列表"""
-        all_member = self.get_value_by_key(key).keys()
-        return list(all_member)
+        """根据资源类型，获取集群中对应资源的所有成员，返回列表"""
+        try:
+            all_member = self.get_value_by_key(key).keys()
+            return list(all_member)
+        except TypeError:
+            pass
 
     def get_all_member_num(self, key):
-        """获取集群中对应资源的所有成员的数量"""
-        member_len = self.get_length(key)
-        return member_len
+        """根据资源类型，获取集群中对应资源的所有成员的数量"""
+        try:
+            member_len = self.get_length(key)
+            return member_len
+        except TypeError:
+            pass
 
     def get_node_list_via_sg(self, sg):
         """通过服务组名得到该服务组的节点列表"""
-        node_list = self.get_value_by_key("Service_Group", sg, "node")
-        return list(node_list)
+        try:
+            node_list = self.get_value_by_key("Service_Group", sg, "node")
+            return list(node_list)
+        except TypeError:
+            pass
 
     def get_shared_portal_via_sg(self, sg):
         """通过服务组名得到该服务组的共享Portal"""
-        shared_portal = self.get_value_by_key("Service_Group", sg, "shared_portal")
-        return shared_portal
+        try:
+            shared_portal = self.get_value_by_key("Service_Group", sg, "shared_portal")
+            return shared_portal
+        except TypeError:
+            pass
 
     def get_str_iqn(self, host_group):
         """通过HostGroup名字获取到对应的IQN字符串"""
-        list_iqn = self.get_value_by_key("Host_Group", "<Host_Group_Name_1>")
-        str_initiator_iqn = ' '.join(list_iqn)
-        return str_initiator_iqn
+        try:
+            list_iqn = self.get_value_by_key("Host_Group", host_group)
+            str_initiator_iqn = ' '.join(list_iqn)
+            return str_initiator_iqn
+        except TypeError:
+            pass
 
     def get_available_pv_size(self, node, type):
         """获取节点上对应类型的全部可用PV以及剩余空间"""
@@ -140,7 +157,7 @@ class ClusterConfig(YamlOperation):
             pass
 
     def get_sp_available_size(self, node, type):
-        """获取节点上对应类型的全部Storagepool以及剩余空间"""
+        """获取节点上对应类型的全部Storagepool以及剩余空间（以及是否是limited）"""
 
         all_sp = {}
         try:
@@ -149,8 +166,9 @@ class ClusterConfig(YamlOperation):
                 if type in sp:
                     size = self.get_value_by_key("Storagepool", sp, "size")
                     used_size = self.get_value_by_key("Storagepool", sp, "used_size")
+                    limited_type = self.get_value_by_key("Storagepool", sp, "limited")
                     available_size = size - used_size
-                    all_sp.update({sp: available_size})
+                    all_sp.update({sp: [available_size, limited_type]})
             return all_sp
         except TypeError:
             pass
@@ -164,35 +182,28 @@ class ClusterConfig(YamlOperation):
         return list_network
 
     def get_target_via_portal(self, portal):
-        list_target = self.get_value_by_key("Portal", portal, "target")
-        return list_target
+        try:
+            list_target = self.get_value_by_key("Portal", portal, "target")
+            return list_target
+        except TypeError:
+            pass
 
     def get_available_vip(self, network_segment):
         """获取一个可用的VIP，并将其移到已使用的分类下"""
-        list_network = self.get_network_segment()
-        if network_segment in list_network:
-            vip_pool = get_vip_pool_name(network_segment)
-            list_available_vip = self.get_value_by_key("VIP_Pool", vip_pool, "available")
-            if list_available_vip:
-                available_vip = list_available_vip.pop()
-                self.add_value_by_key("VIP_Pool", vip_pool, "available", value=available_vip)
-                self.delete_value_in_list("VIP_Pool", vip_pool, "used", value=available_vip)
-                return available_vip
-            else:
-                print("Can't get available vip.")
-
-    # def get_all_vip_via_segment(self, segment):
-    #     """根据网段获取到该网段下的全部VIP"""
-    #     vip_pool_name = get_vip_pool_name(segment)
-    #     available_vip = self.get_value_by_key("VIP_Pool", vip_pool_name, "available")
-    #     used_vip = self.get_value_by_key("VIP_Pool", vip_pool_name, "used")
-    #     if available_vip and used_vip is not None:
-    #         available_vip.extend(used_vip)
-    #         return available_vip
-    #     elif available_vip:
-    #         return available_vip
-    #     elif used_vip:
-    #         return used_vip
+        try:
+            list_network = self.get_network_segment()
+            if network_segment in list_network:
+                vip_pool = get_vip_pool_name(network_segment)
+                list_available_vip = self.get_value_by_key("VIP_Pool", vip_pool, "available")
+                if list_available_vip:
+                    available_vip = list_available_vip.pop()
+                    self.add_value_by_key("VIP_Pool", vip_pool, "available", value=available_vip)
+                    self.delete_value_in_list("VIP_Pool", vip_pool, "used", value=available_vip)
+                    return available_vip
+                else:
+                    print("Can't get available vip.")
+        except TypeError:
+            pass
 
     def write_sg_into_cluster(self, group_name, list_node):
         """读取服务组信息，更新到集群配置文件中"""
@@ -222,24 +233,6 @@ class ClusterConfig(YamlOperation):
     def write_vip_pool_into_cluster(self, segment, tag, list_ip):
         """读取VIP池信息，更新到集群配置文件中"""
         try:
-            # prepare_vip_pool = self.yaml_dict["VIP Pool"]
-            # cluster_dict = cluster_config.read_yaml()
-            # network_segment = cluster_config.get_network_segment()
-            # sg_dict = {}
-            # for vip_pool in prepare_vip_pool:
-            #     if vip_pool["network_segment"] in network_segment:
-            #         for ip in vip_pool["IP"]:
-            #             # vip_pool_name = get_vip_pool_name(ip)
-            #             vip_pool_name = "<VIP_Pool_Name_1>"
-            #             if ip in cluster_config.get_value_by_key("VIP_Pool", vip_pool_name, "available"):
-            #                 print(ip, "already exists")
-            #             elif ip in cluster_config.get_value_by_key("VIP_Pool", vip_pool_name, "used"):
-            #                 print(ip, "already in use")
-            #             else:
-            #                 list_available_ip = cluster_config.get_value_by_key("VIP_Pool", vip_pool_name, "available")
-            #                 list_available_ip.append(ip)
-            #                 cluster_config.modify_value_by_key("VIP_Pool", vip_pool_name, "available",
-            #                                                    value=list_available_ip)
             vip_pool_name = get_vip_pool_name(segment)
             str = f'''
             {vip_pool_name}: 
