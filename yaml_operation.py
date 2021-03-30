@@ -49,7 +49,7 @@ class ClusterConfig(YamlOperation):
                     return
             return value
         except (AttributeError, TypeError):
-            print("Error key!!")
+            pass
 
     def get_length(self, *value):
         """根据传进来的Key，获取对应的value值的长度"""
@@ -57,24 +57,6 @@ class ClusterConfig(YamlOperation):
             return len(self.get_value_by_key(*value))
         except TypeError:
             print("Failed to get length.")
-
-    def delete_value_by_key(self, *key_tuple):
-        """根据传进来的Key，删除对应的value值"""
-        key_value = self.yaml_dict
-        for key in key_tuple:
-            if key == key_tuple[-1]:
-                del key_value[key_tuple[-1]]
-                break
-            key_value = key_value[key]
-        self.update_yaml(self.yaml_dict)
-
-    def delete_value_in_list(self, *key_tuple, value):
-        """根据传进来的Key，删除对应的value（list）中的某个值"""
-        config_value = self.get_value_by_key(*key_tuple)
-        if config_value:
-            if type(config_value) is list:
-                config_value.remove(value)
-                self.modify_value_by_key(*key_tuple, value=config_value)
 
     def modify_value_by_key(self, *key_tuple, value):
         """根据传进来的Key，修改对应的value值"""
@@ -85,8 +67,26 @@ class ClusterConfig(YamlOperation):
             key_value = key_value[key]
         self.update_yaml(self.yaml_dict)
 
+    def delete_value_by_key(self, *key_tuple):
+        """根据传进来的Key，删除对应的字典"""
+        key_value = self.yaml_dict
+        for key in key_tuple:
+            if key == key_tuple[-1]:
+                del key_value[key_tuple[-1]]
+                break
+            key_value = key_value[key]
+        self.update_yaml(self.yaml_dict)
+
+    def delete_value_in_list(self, *key_tuple, value):
+        """根据传进来的Key，删除对应的列表中的某个值"""
+        config_value = self.get_value_by_key(*key_tuple)
+        if config_value:
+            if type(config_value) is list:
+                config_value.remove(value)
+                self.modify_value_by_key(*key_tuple, value=config_value)
+
     def add_value_by_key(self, *key_tuple, value):
-        """根据传进来的Key，添加某个值到对应的value（list）中"""
+        """根据传进来的Key，添加某个值到对应的字典或者列表中"""
         config_value = self.get_value_by_key(*key_tuple)
         if config_value:
             if type(config_value) is list:
@@ -159,17 +159,28 @@ class ClusterConfig(YamlOperation):
     def get_sp_available_size(self, node, type):
         """获取节点上对应类型的全部Storagepool以及剩余空间（以及是否是limited）"""
 
-        all_sp = {}
+        all_sp = {"sp_limited": {}, "sp_normal": {}}
         try:
             sp_list = self.get_value_by_key("Node", node, "storagepool")
             for sp in sp_list:
                 if type in sp:
                     size = self.get_value_by_key("Storagepool", sp, "size")
                     used_size = self.get_value_by_key("Storagepool", sp, "used_size")
-                    limited_type = self.get_value_by_key("Storagepool", sp, "limited")
                     available_size = size - used_size
-                    all_sp.update({sp: [available_size, limited_type]})
+                    limited_type = self.get_value_by_key("Storagepool", sp, "limited")
+                    if limited_type is True:
+                        all_sp["sp_limited"].update({sp: available_size})
+                    elif limited_type is False:
+                        all_sp["sp_normal"].update({sp: available_size})
             return all_sp
+        except TypeError:
+            pass
+
+    def get_volume_by_sp_name(self, sp_name):
+        """根据存储池的名称获取到其使用的volume名"""
+        try:
+            volume = self.get_value_by_key("Storagepool", sp_name, "volume")
+            return volume
         except TypeError:
             pass
 
@@ -215,8 +226,8 @@ class ClusterConfig(YamlOperation):
               dedicate_portal: []
               resource_set: []
             '''
-            dict = yaml.safe_load(str)
-            self.add_value_by_key("Service_Group", value=dict)
+            dict_sg = yaml.safe_load(str)
+            self.add_value_by_key("Service_Group", value=dict_sg)
             print("Success in creating Service Group:", group_name)
         except(KeyError, TypeError):
             pass
@@ -224,8 +235,8 @@ class ClusterConfig(YamlOperation):
     def write_hg_into_cluster(self, group_name, list_iqn):
         """读取主机组信息，更新到集群配置文件中"""
         try:
-            hg_dict = {group_name: list_iqn}
-            self.add_value_by_key("Host_Group", value=hg_dict)
+            dict_hg = {group_name: list_iqn}
+            self.add_value_by_key("Host_Group", value=dict_hg)
             print("Success in creating Host Group:", group_name)
         except(KeyError, TypeError):
             pass
@@ -241,9 +252,9 @@ class ClusterConfig(YamlOperation):
               available: {list_ip} 
               used: []
             '''
-            dict = yaml.safe_load(str)
-            self.add_value_by_key("VIP_Pool", value=dict)
-            print("Success in create VIP Pool:", vip_pool_name)
+            dict_vip_pool = yaml.safe_load(str)
+            self.add_value_by_key("VIP_Pool", value=dict_vip_pool)
+            print("Success in creating VIP Pool:", vip_pool_name)
         except(KeyError, TypeError):
             pass
 
@@ -258,10 +269,8 @@ class PolicyConfig(YamlOperation):
         try:
             if self.yaml_dict["Kind"]:
                 return self.yaml_dict["Kind"]
-            else:
-                print("Missing value of 'Kind'")
         except (KeyError, TypeError):
-            print("Missing 'Kind'")
+            print("Missing config of 'Kind'")
 
     def get_creation(self):
         """读取文件的Creation字段，返回列表"""
@@ -269,7 +278,8 @@ class PolicyConfig(YamlOperation):
             if self.yaml_dict["Creation"]:
                 return self.yaml_dict["Creation"]
         except KeyError:
-            print("Missing config which is used to create resource.")
+            print("Missing config of 'Creation'")
 
-    if __name__ == '__main__':
-        pass
+
+if __name__ == '__main__':
+    pass
