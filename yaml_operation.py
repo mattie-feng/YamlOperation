@@ -1,12 +1,5 @@
 # -*- coding:utf-8 -*-
-import pprint
 import yaml
-
-
-def get_vip_pool_name(str):
-    """通过传进来的网段组成VIP池的名称"""
-    vip_pool_name = "pool_" + "_".join(str.split("."))
-    return vip_pool_name
 
 
 class YamlOperation(object):
@@ -260,80 +253,6 @@ class ClusterConfig(YamlOperation):
             print("Success in creating VIP Pool:", vip_pool_name)
         except(KeyError, TypeError):
             pass
-
-    # def write_sp_into_cluster(self, name):
-    #     """更新Storagepool配置到数据库中"""
-    #     try:
-    #         str = f'''
-    #                 {name}:
-    #                 '''
-    #         dict_sp = yaml.safe_load(str)
-    #         self.add_value_by_key("Storagepool", value=dict_sp)
-    #     except(KeyError, TypeError):
-    #         pass
-    #
-    # def write_mirror_into_cluster(self, name):
-    #     """更新Mirror配置到数据库中"""
-    #     try:
-    #         str = f'''
-    #                 {name}:
-    #
-    #                 '''
-    #         dict_mirror = yaml.safe_load(str)
-    #         self.add_value_by_key("Mirror", value=dict_mirror)
-    #     except(KeyError, TypeError):
-    #         pass
-    #
-    # def write_portal_into_cluster(self, name):
-    #     """更新Portal配置到数据库中"""
-    #     try:
-    #         str = f'''
-    #                 {name}:
-    #                 '''
-    #         dict_portal = yaml.safe_load(str)
-    #         self.add_value_by_key("Portal", value=dict_portal)
-    #     except(KeyError, TypeError):
-    #         pass
-    #
-    # def write_target_into_cluster(self, name):
-    #     """更新Target配置到数据库中"""
-    #     try:
-    #         str = f'''
-    #                 {name}:
-    #                 '''
-    #         dict_target = yaml.safe_load(str)
-    #         self.add_value_by_key("Target", value=dict_target)
-    #     except(KeyError, TypeError):
-    #         pass
-    #
-    # def write_ilu_into_cluster(self, name):
-    #     """更新iSCSILogicalUnit配置到数据库中"""
-    #     try:
-    #         str = f'''
-    #                 {name}:
-    #                 '''
-    #         dict_ilu = yaml.safe_load(str)
-    #         self.add_value_by_key("iLU", value=dict_ilu)
-    #     except(KeyError, TypeError):
-    #         pass
-    #
-    # def write_resource_set_into_cluster(self, name, list_resource, host_group, ):
-    #     """更新Resource Set配置到数据库中"""
-    #     try:
-    #         str = f'''
-    #                 {name}:
-    #                     resource:
-    #                     host_group:
-    #                     servie_group:
-    #                         name:
-    #                         portal_type:
-    #                         portal:
-    #                         target:
-    #                 '''
-    #         dict_resource_set = yaml.safe_load(str)
-    #         self.add_value_by_key("Resource_Set", value=dict_resource_set)
-    #     except(KeyError, TypeError):
-    #         pass
 
 
 class PolicyConfig(YamlOperation):
