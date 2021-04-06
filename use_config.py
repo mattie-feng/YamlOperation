@@ -13,7 +13,10 @@ def practice():
     # pprint.pprint(config.get_member_list("Host_Group"))
     # pprint.pprint(config.get_str_iqn("<Host_Group_Name_1>"))
     # pprint.pprint(config.get_available_pv_size("<Node_Name_1>","HDD"))
-    # pprint.pprint(config.get_sp_available_size("<Node_Name_1>", "HDD"))
+    # pprint.pprint(config.get_sp_available_size("<Node_Name_1>", "hdd"))
+    pprint.pprint(config.get_volume_by_sp_name("sp_hdd_29180391"))
+    pprint.pprint(config.get_volume_by_sp_name("sp_<Node_Name>_hdd_<Storagepool_Name_2>"))
+
     # pprint.pprint(config.get_target_via_portal("<Portal_Name_1>"))
     # pprint.pprint(config.get_available_vip("xx.xx.x1.0"))
 
@@ -33,6 +36,7 @@ def test():
     config2 = yaml_operation.ClusterConfig(file_name)
     kind = config.get_kind()
     creation_config = config.get_creation()
+    # print(creation_config)
     if "Service Group" == kind:
         for sg in creation_config:
             config2.write_sg_into_cluster(sg["group_name"], sg["node"])

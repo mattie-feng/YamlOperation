@@ -1,0 +1,298 @@
+DRBD:
+  <DRBD_Name_1>:
+    diskfull_node:
+    - xx
+    - xx
+    diskless_node:
+    - xx
+    - xx
+    mirror_way: x
+    path: /dev/drbdxxx
+    size: xx
+  <DRBD_Name_2>:
+    diskfull_node:
+    - xx
+    - xx
+    diskless_node:
+    - xx
+    - xx
+    mirror_way: x
+    path: /dev/drbdxxx
+    size: xx
+Host_Group:
+  <Host_Group_Name_01>:
+  - <Host_IQN>
+  - <Host_IQN>
+  <Host_Group_Name_02>:
+  - <Host_IQN>
+  - <Host_IQN>
+  <Host_Group_Name_111>:
+  - <Host_IQN>
+  - <Host_IQN>
+  <Host_Group_Name_11>:
+  - <Host_IQN1>
+  - <Host_IQN2>
+  <Host_Group_Name_12>:
+  - <Host_IQN3>
+  - <Host_IQN4>
+  <Host_Group_Name_1>:
+  - <Host_IQN1>
+  - <Host_IQN2>
+  <Host_Group_Name_222>:
+  - <Host_IQN>
+  - <Host_IQN>
+  <Host_Group_Name_2>:
+  - <Host_IQN3>
+  - <Host_IQN4>
+  H1:
+  - a
+  - b
+  H2:
+  - a
+  - b
+  - c
+  H3:
+  - d
+  - f
+Node:
+  <Node_Name_1>:
+    ip: xx.xx.xx.xx
+    pv:
+      available:
+      - <6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-345678>
+      - <6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2>
+      used:
+      - 6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2
+      - 6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2
+    storagepool:
+    - sp_<Node_Name>_hdd_<Storagepool_Name_1>
+    - sp_<Node_Name>_hdd_<Storagepool_Name_2>
+    - sp_hdd_29180391
+    type: Combined
+  <Node_Name_2>:
+    ip: xx.xx.xx.x
+    pv:
+      available:
+      - 6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2
+      - 6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2
+      used:
+      - 6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2
+      - 6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2
+    storagepool:
+    - <Node_Name>_<Storagepool_Name_3>
+    - <Node_Name>_<Storagepool_Name_4>
+    type: Combined
+PV:
+  <6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-345678>:
+    node: node2
+    path: /dev/xx
+    size: 10
+    type: HDD
+  <6tgB6V-qM6T-9d7G-39ld-E1WA-fcXF-5EaoZ2>:
+    node: node1
+    path: /dev/xx
+    size: 20
+    type: HDD
+Portal:
+  <Portal_Name_1>:
+    ip: xx.xx.xx.x
+    netmask: xx
+    port: 3260
+    target:
+    - <Target_Name_1>
+    - <Target_Name_2>
+  <Portal_Name_2>:
+    ip: xx.xx.xx.x
+    netmask: xx
+    port: 3260
+    target:
+    - <Target_Name_3>
+    - <Target_Name_4>
+Resource_Set:
+  <Resource_Set_Name_1>:
+    host_group: <Host_Group_Name_1>
+    resource:
+    - <DRBD_Name_1>
+    - <DRBD_Name_2>
+    servie_group:
+      name: <Service_Group_Name_1>
+      portal: <Portal_Name_1>
+      portal_type: shared
+      target:
+      - <Target_Name_1>
+      - <Target_Name_2>
+  <Resource_Set_Name_2>:
+    host_group: <Host_Group_Name_2>
+    resource:
+    - <DRBD_Name_3>
+    - <DRBD_Name_4>
+    servie_group:
+      name: <Service_Group_Name_2>
+      portal: <Portal_Name_2>
+      portal_type: dedicate
+      target:
+      - <Target_Name_3>
+Service_Group:
+  <Service_Group_Name>:
+    dedicate_portal: null
+    node:
+    - <Node_Name>
+    - <Node_Name>
+    resource_set: null
+    shared_portal: null
+  <Service_Group_Name_01>:
+    dedicate_portal: null
+    node:
+    - <Node_Name>
+    - <Node_Name>
+    resource_set: null
+    shared_portal: null
+  <Service_Group_Name_02>:
+    dedicate_portal: null
+    node:
+    - <Node_Name>
+    - <Node_Name>
+    resource_set: null
+    shared_portal: null
+  <Service_Group_Name_11>:
+    dedicate_portal: null
+    node:
+    - <Node_Name_1>
+    - <Node_Name_2>
+    resource_set: null
+    shared_portal: 10.203.1.22
+  <Service_Group_Name_12>:
+    dedicate_portal: null
+    node:
+    - <Node_Name_3>
+    - <Node_Name_4>
+    resource_set: null
+    shared_portal: null
+  <Service_Group_Name_1>:
+    dedicate_portal:
+    - <Portal_Name_1>
+    - <Portal_Name_2>
+    node:
+    - <Node_Name_1>
+    - <Node_Name_2>
+    resource_set:
+    - <Resource_Set_Name_1>
+    - <Resource_Set_Name_2>
+    shared_portal: <Portal_Name_6>
+  <Service_Group_Name_2>:
+    dedicate_portal:
+    - <Portal_Name_3>
+    - <Portal_Name_4>
+    node:
+    - <Node_Name_3>
+    - <Node_Name_4>
+    resource_set:
+    - <Resource_Set_Name_3>
+    - <Resource_Set_Name_4>
+    shared_portal: <Portal_Name_10>
+Storagepool:
+  sp_<Node_Name>_hdd_<Storagepool_Name_1>:
+    limited: true
+    size: 20
+    type: lvm
+    volume: VG3
+    used_size: 10
+  sp_<Node_Name>_hdd_<Storagepool_Name_2>:
+    limited: false
+    size: 30.58
+    type: lvm_thin
+    volume: VG2
+    used_size: 10
+  sp_hdd_29180391:
+    limited: false
+    size: 20
+    type: lvm_thin
+    volume: VG1
+    used_size: 10.50
+Target:
+  <Target_Name_1>:
+    iqn: iqn.xxxxxx:xxx
+    lun_id_assignment: 254
+    portal: <Portal_Name_1>
+  <Target_Name_2>:
+    iqn: iqn.xxxxxx:xxx
+    lun_id_assignment: 0
+    portal: <Portal_Name_2>
+VIP_Pool:
+  <VIP_Pool_Name_2>:
+    available:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    network_segment: xx.xx.x3.0
+    tag: xxx
+    used:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+  pool_xx_xx_x1_0:
+    available:
+    - xx.xx.xx.6
+    - xx.xx.xx.6
+    - xx.xx.xx.6
+    - xx.xx.xx.6
+    network_segment: xx.xx.x1.0
+    tag: xxx
+    used:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    - xx.xx.xx.4
+    - xx.xx.xx.3
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    - xx.xx.xx.1
+    - xx.xx.xx.2
+  pool_xx_xx_x2_0:
+    available:
+    - xx.xx.xx.3
+    - xx.xx.xx.4
+    network_segment: xx.xx.x2.0
+    tag: xx
+    used: null
+  pool_xx_xx_xx_10:
+    available:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    network_segment: xx.xx.xx.10
+    tag: xx
+    used: []
+  pool_xx_xx_xx_x:
+    available:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    network_segment: xx.xx.xx.x
+    tag: xx
+    used: []
+  pool_xx_xx_xx_x08:
+    available:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    network_segment: xx.xx.xx.x08
+    tag: xx
+    used: []
+  pool_xx_xx_xx_x09:
+    available:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    network_segment: xx.xx.xx.x09
+    tag: xx
+    used: []
+  pool_xx_xx_xx_x9:
+    available:
+    - xx.xx.xx.x
+    - xx.xx.xx.x
+    network_segment: xx.xx.xx.x9
+    tag: xx
+    used: []
+iLU:
+  <iLU_Name_1>:
+    host: <Host_Group_Name_1>
+    lun_id: 0
+    target: <Target_Name_1>
+  <iLU_Name_2>:
+    host: <Host_Group_Name_2>
+    lun_id: 255
+    target: <Target_Name_2>

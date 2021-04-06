@@ -199,25 +199,28 @@ class ClusterConfig(YamlOperation):
         except TypeError:
             pass
 
-    def get_available_vip(self, network_segment):
-        """获取一个可用的VIP，并将其移到已使用的分类下"""
+    def get_available_vip(self, vip_pool_name):
+        """根据VIP池的名称从VIP池获取到一个可用的VIP"""
         try:
-            list_network = self.get_network_segment()
-            if network_segment in list_network:
-                vip_pool = get_vip_pool_name(network_segment)
-                list_available_vip = self.get_value_by_key("VIP_Pool", vip_pool, "available")
-                if list_available_vip:
-                    available_vip = list_available_vip.pop()
-                    self.add_value_by_key("VIP_Pool", vip_pool, "available", value=available_vip)
-                    self.delete_value_in_list("VIP_Pool", vip_pool, "used", value=available_vip)
-                    return available_vip
-                else:
-                    print("Can't get available vip.")
+            list_available_vip = self.get_value_by_key("VIP_Pool", vip_pool_name, "available")
+            if list_available_vip:
+                available_vip = list_available_vip[0]
+                return available_vip
+            else:
+                print("Can't get available vip.")
         except TypeError:
             pass
 
+    def mark_vip_as_used(self, vip_pool_name, vip):
+        """根据VIP池的名称和VIP，将该VIP从可选部分移到已使用部分"""
+        try:
+            self.delete_value_in_list("VIP_Pool", vip_pool_name, "available", value=vip)
+            self.add_value_by_key("VIP_Pool", vip_pool_name, "used", value=vip)
+        except Exception:
+            pass
+
     def write_sg_into_cluster(self, group_name, list_node):
-        """读取服务组信息，更新到集群配置文件中"""
+        """更新服务组配置到数据库中"""
         try:
             str = f'''
             {group_name}: 
@@ -233,7 +236,7 @@ class ClusterConfig(YamlOperation):
             pass
 
     def write_hg_into_cluster(self, group_name, list_iqn):
-        """读取主机组信息，更新到集群配置文件中"""
+        """更新主机组配置到数据库中"""
         try:
             dict_hg = {group_name: list_iqn}
             self.add_value_by_key("Host_Group", value=dict_hg)
@@ -241,10 +244,10 @@ class ClusterConfig(YamlOperation):
         except(KeyError, TypeError):
             pass
 
-    def write_vip_pool_into_cluster(self, segment, tag, list_ip):
-        """读取VIP池信息，更新到集群配置文件中"""
+    def write_vip_pool_into_cluster(self, vip_pool_name, segment, tag, list_ip):
+        """更新VIP池配置到数据库中"""
         try:
-            vip_pool_name = get_vip_pool_name(segment)
+            # vip_pool_name = get_vip_pool_name(segment)
             str = f'''
             {vip_pool_name}: 
               network_segment: {segment}
@@ -257,6 +260,80 @@ class ClusterConfig(YamlOperation):
             print("Success in creating VIP Pool:", vip_pool_name)
         except(KeyError, TypeError):
             pass
+
+    # def write_sp_into_cluster(self, name):
+    #     """更新Storagepool配置到数据库中"""
+    #     try:
+    #         str = f'''
+    #                 {name}:
+    #                 '''
+    #         dict_sp = yaml.safe_load(str)
+    #         self.add_value_by_key("Storagepool", value=dict_sp)
+    #     except(KeyError, TypeError):
+    #         pass
+    #
+    # def write_mirror_into_cluster(self, name):
+    #     """更新Mirror配置到数据库中"""
+    #     try:
+    #         str = f'''
+    #                 {name}:
+    #
+    #                 '''
+    #         dict_mirror = yaml.safe_load(str)
+    #         self.add_value_by_key("Mirror", value=dict_mirror)
+    #     except(KeyError, TypeError):
+    #         pass
+    #
+    # def write_portal_into_cluster(self, name):
+    #     """更新Portal配置到数据库中"""
+    #     try:
+    #         str = f'''
+    #                 {name}:
+    #                 '''
+    #         dict_portal = yaml.safe_load(str)
+    #         self.add_value_by_key("Portal", value=dict_portal)
+    #     except(KeyError, TypeError):
+    #         pass
+    #
+    # def write_target_into_cluster(self, name):
+    #     """更新Target配置到数据库中"""
+    #     try:
+    #         str = f'''
+    #                 {name}:
+    #                 '''
+    #         dict_target = yaml.safe_load(str)
+    #         self.add_value_by_key("Target", value=dict_target)
+    #     except(KeyError, TypeError):
+    #         pass
+    #
+    # def write_ilu_into_cluster(self, name):
+    #     """更新iSCSILogicalUnit配置到数据库中"""
+    #     try:
+    #         str = f'''
+    #                 {name}:
+    #                 '''
+    #         dict_ilu = yaml.safe_load(str)
+    #         self.add_value_by_key("iLU", value=dict_ilu)
+    #     except(KeyError, TypeError):
+    #         pass
+    #
+    # def write_resource_set_into_cluster(self, name, list_resource, host_group, ):
+    #     """更新Resource Set配置到数据库中"""
+    #     try:
+    #         str = f'''
+    #                 {name}:
+    #                     resource:
+    #                     host_group:
+    #                     servie_group:
+    #                         name:
+    #                         portal_type:
+    #                         portal:
+    #                         target:
+    #                 '''
+    #         dict_resource_set = yaml.safe_load(str)
+    #         self.add_value_by_key("Resource_Set", value=dict_resource_set)
+    #     except(KeyError, TypeError):
+    #         pass
 
 
 class PolicyConfig(YamlOperation):

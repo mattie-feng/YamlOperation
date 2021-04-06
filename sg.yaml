@@ -1,0 +1,34 @@
+Kind: Service Group
+
+# 创建服务组
+Creation:
+  - group_name: <Service_Group_Name_03>
+    cluster: config.yaml # 指定名字; 指定文件名，表示先创建相应集群，不过暂时恐怕碰不到
+    node:
+      - <Node_Name>
+      - <Node_Name>
+  - group_name: <Service_Group_Name_04>
+    cluster: config.yaml
+    node:
+      - <Node_Name>
+      - <Node_Name>
+
+# 修改服务组（可能有这个功能）
+Modify:
+  - group_name: <Service_Group_Name>
+    cluster: <Cluster name>
+    delete_node:
+      - <Node_Name>
+      - <Node_Name>
+  - group_name: <Service_Group_Name>
+    cluster: <Cluster name>
+    add_node:
+      - <Node_Name>
+      - <Node_Name>
+
+# 删除服务组
+Destory:
+  - group_name: <Service_Group_Name>
+    cluster: <Cluster name>
+  - group_name: <Service_Group_Name>
+    cluster: <Cluster name>

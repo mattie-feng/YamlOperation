@@ -1,0 +1,36 @@
+Kind: VIP Pool
+
+# 创建VIP池
+Creation:
+  - network_segment: xx.xx.xx.x9
+    cluster: config.yaml
+    tag: xx #eg: xG,Cisco,Cisco7800,SFP,RJ45
+    ip:
+      - xx.xx.xx.x
+      - xx.xx.xx.x
+  - network_segment: xx.xx.xx.10
+    cluster: config.yaml
+    tag: xx
+    ip:
+      - xx.xx.xx.x
+      - xx.xx.xx.x
+
+# 修改VIP池
+Modify:
+  - network_segment: xx.xx.xx.x
+    cluster: <Cluster name>
+    delete_vip:
+      - xx.xx.xx.x # VIP
+      - xx.xx.xx.x
+  - network_segment: xx.xx.xx.x
+    cluster: <Cluster name>
+    add_vip:
+      - xx.xx.xx.x
+      - xx.xx.xx.x
+
+# 删除VIP池
+Destory:
+  - network_segment: xx.xx.xx.x
+    cluster: <Cluster name>
+  - network_segment: xx.xx.xx.x
+    cluster: <Cluster name>
